@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <!-- 
+  <parent>
+    <groupId>wetheinter.net</groupId>
+    <artifactId>xapi-parent</artifactId>
+    <version>0.2</version>
+  </parent>
+   -->
+
+  <artifactId>xapi-template</artifactId>
+  <packaging>jar</packaging>
+  <name>XApi - Code Generator Templates</name>
+  <url>WeTheInter.net</url>
+  <description>
+    A simple templating system for java codegen.
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>2.5.0</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>wetheinter.net.dev.template.TemplateToJava</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
