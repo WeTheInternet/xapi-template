@@ -3,6 +3,10 @@ package wetheinter.net.dev.template;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Random;
+import java.util.Map.Entry;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -91,51 +95,61 @@ public class TestTemplate implements TemplateClassGenerator{
 
 	@Test
 	public void testSimpleGeneration() throws Exception{
+	  //create a temp classpath
+	  File tmp = new File(System.getProperty("java.io.tmpdir","/tmp"));
+	  File cp = new File(tmp, "testCompile-"+Long.toHexString(new Random().nextLong()));
+	  cp.mkdirs();
+	  cp.deleteOnExit();
+
 	  //apply template
+	  System.err.println(
+	    getClass().getClassLoader().getResource("wetheinter/net/template/Success.x")
+	    .toExternalForm().replace("file:", "")
+	    );
 	  TemplateToJava.main(new String[] {
-	    "-template","wetheinter/net/template/Success.x",
-	    "-output","/tmp/gen"
+	    "-template",getClass().getClassLoader().getResource("wetheinter/net/template/Success.x")
+	      .toExternalForm().replace("file:", ""),
+	    "-output",cp.getAbsolutePath()
 	  });
 
 	  //compile the file
-	  JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+	  final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 	  String junit = Assert.class.getProtectionDomain().getCodeSource()
 	    .getLocation().toExternalForm().substring(5);//removes file: prefix
-	  //select a classpath
-	  String output = null;
-	  //if we're running in maven, basedir will be set for us.
-	  String basedir = System.getProperty("basedir");
-	  if (basedir == null) {
-	    //no maven? default to looking for the classes folder that loaded us
-	    output = getClass().getProtectionDomain().getCodeSource().getLocation()
-	      .toExternalForm().replace("file:", "");
-	  }else {
-	    File dir = new File(basedir, "target/test-classes");
-	    if (!dir.isDirectory()) {
-	      logger.log(Type.WARN, "Unable to run template generator test",
-	        new FileNotFoundException(dir.getAbsolutePath()));
-	      return;
-	    }
-	    output = dir.getAbsolutePath();
-	  }
-	  if (output == null)
-	    throw new RuntimeException("Unable to find an output folder to compile into. " +
-	    		"Ensure at least one writable folder is contained in the test classpath. " +
-	    		"Preferably a folder which gets cleaned, like target/test-classes");
+
+	  //our argument list
 	  String[] args = new String[] {
 	    "-cp", junit,
-	    "-d", output
-	    ,"/tmp/gen/wetheinter/net/generated/Success.java"
+	    "-d", cp.getAbsolutePath()
+	    //let file normalize our / slashes
+	    ,new File(cp.getAbsolutePath(),"wetheinter/net/generated/Success.java")
+	      .getPath()
 	  };
+	  //run the compile
 	  int result = compiler.run(System.in, System.out, System.err, args);
 	  if (result != 0)
 	    throw new RuntimeException("Java compile failed w/ status code "+result);
 
-    //run it, reflectively
-    Class<?> cls = compiler.getClass().getClassLoader()
-      .loadClass("wetheinter.net.template.Success");
-    Method method = cls.getMethod("main", String[].class);
-    method.invoke(null, (Object)(new String[] {"success"}));
+	  //create a thread with the required classes on the classpath
+	  final URLClassLoader cl = new URLClassLoader(new URL[] {
+	    new URL("file:"+junit+File.separator),
+	    new URL("file:"+cp.getAbsolutePath()+File.separator)
+	  });
+	  Thread t = new Thread() {
+	    @Override
+	    public void run() {
+	      //run the generated class reflectively
+	      try {
+	      Class<?> cls = cl.loadClass("wetheinter.net.generated.Success");
+	      Method method = cls.getMethod("main", String[].class);
+	      method.invoke(null, (Object)(new String[] {"success"}));
+	      } catch (Exception e) {
+	        throw new RuntimeException(e);
+	      }
+	    }
+	  };
+	  t.setContextClassLoader(cl);
+	  t.run();
 	}
 
 }

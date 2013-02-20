@@ -4,6 +4,12 @@
 
  Distributed under a modified BSD License as follow:
 
+ All art, trademarks and the use of "We The Internet" is reserved, and may
+ not be used, distributed or otherwise publicly displayed without written
+ consent of We The Internet Ltd.
+ 
+ All source and code is free to use, modify and redistribute as you please.
+ 
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
 
@@ -14,7 +20,11 @@
  this list of conditions and the following disclaimer in the documentation
  and/or other materials provided with the distribution, unless otherwise
  agreed to in a written document signed by a director of We The Internet Ltd.
-
+ 
+ You are not required to give attribution on any publicly displayed runtime
+ instances of your software.  Only the source and binary archives must retain
+ this notice.
+ 
  Neither the name of We The Internet nor the names of its contributors may
  be used to endorse or promote products derived from this software without
  specific prior written permission.

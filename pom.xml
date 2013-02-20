@@ -1,37 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <!-- 
   <parent>
-    <groupId>wetheinter.net</groupId>
-    <artifactId>xapi-parent</artifactId>
-    <version>0.2</version>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
   </parent>
-   -->
 
+  <groupId>net.wetheinter</groupId>
   <artifactId>xapi-template</artifactId>
+  <version>0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>XApi - Code Generator Templates</name>
-  <url>WeTheInter.net</url>
+  <!-- <url>WeTheInter.net</url> -->
+
+
   <description>
     A simple templating system for java codegen.
+
+    This library includes an object-oriented, fluent source writing api, for a chained, intuitive codegen api.
+    It also includes a template processor which can take java source files formatted with "magic comments",
+    to allow simple mapping of GeneratorClass#generatorMethod() to inject dynamic source content.
+
+    //@generateWith(GeneratorClass)//
+    -Sets the current generator.  You may use as many as you please
+    //generatorMethod(arbitrary-string-data-you-may-want-to-parse)//
+    -invokes the named method on the current injector, with any text (between brackets) sent as a string
+
+    This allows you to markup default source with hooks where you may want to inject arbitrary code.
+
+    It is especially useful for generating super-source in gwt compiles; changes to the default class are propagated to overrides.
   </description>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-dev</artifactId>
-      <version>2.5.0</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
+  
+  <properties>
+    <!-- Use the minimum version we support; labs modules can have 1.8 if they please -->
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+  </properties>
+
 
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+          <version>2.4</version>
         <configuration>
           <archive>
             <manifest>
@@ -42,5 +56,130 @@
       </plugin>
     </plugins>
   </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
+    </dependency>
+
+   <!-- TODO get rid of this, or shade it -->
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>2.5.0</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+
+<!-- Requirements to deploy to central -->
+<url>https://github.com/WeTheInternet/xapi-template</url>
+	<scm>
+		<url>git@github.com:WeTheInternet/xapi-template.git</url>
+		<connection>scm:git:git@github.com:WeTheInternet/xapi-template.git</connection>
+		<developerConnection>scm:git:git@github.com:WeTheInternet/xapi-template.git</developerConnection>
+	</scm>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<inceptionYear>December 07, 2012</inceptionYear>
+	<organization>
+		<url>http://wetheinter.net</url>
+		<name>The Internet Party</name>
+	</organization>
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/WeTheInternet/xapi-template/issues</url>
+	</issueManagement>
+	<developers>
+		<developer>
+			<name>James X. Nelson</name>
+			<email>james@wetheinter.net</email>
+			<organizationUrl>http://www.wetheinter.net/</organizationUrl>
+		</developer>
+	</developers>
+
+	<distributionManagement>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Sonatype Release</name>
+			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>sonatype-nexus-snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<site>
+			<id>github-project-site</id>
+			<url>gitsite:git@github.com/WeTheInternet/xapi-template.git</url>
+		</site>
+	</distributionManagement>
+
+  <profiles>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+             <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test-jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.1</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

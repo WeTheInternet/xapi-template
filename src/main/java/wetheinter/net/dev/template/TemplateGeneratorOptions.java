@@ -35,6 +35,7 @@
 
 package wetheinter.net.dev.template;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +80,8 @@ public class TemplateGeneratorOptions extends ArgProcessorBase implements Option
 
 		@Override
 		public boolean setString(String str) {
-			opts.outputLocation = str;
+			opts.outputLocation = str.endsWith(File.separator)
+			  ? str : str + File.separator;
 			return true;
 		}
 

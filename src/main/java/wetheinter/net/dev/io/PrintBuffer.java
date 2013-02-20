@@ -272,21 +272,27 @@ public class PrintBuffer {
    * Tests to ensure there is no recursion between nodes.
    */
   private boolean notContained(PrintBuffer buffer) {
-    if (buffer == this)
-      return true;
+    if (buffer == this) {
+      System.err.println("Trying to add a buffer to itself");
+      return false;
+    }
     PrintStack next = head;
     while (next!=null) {
-      if (next.buffer == buffer)
-        return true;
+      if (next.buffer == buffer) {
+        System.err.println("Trying to add a buffer that is already a child");
+        return false;
+      }
       next = next.next;
     }
     next = buffer.head;
     while (next!=null) {
-      if (next.buffer == this)
-        return true;
+      if (next.buffer == this) {
+        System.err.println("Trying to add an ancestor to a child");
+        return false;
+      }
       next = next.next;
     }
-    return false;
+    return true;
   }
 
   protected String header() {

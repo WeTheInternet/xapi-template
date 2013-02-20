@@ -38,6 +38,7 @@ package wetheinter.net.dev.template;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -85,16 +86,25 @@ public class TemplateToJava {
   private Class<?> generatorClass;
   private final Map<Class<?>,Object> generators = new HashMap<Class<?>,Object>();
 
+  @SuppressWarnings("resource")
   private void generate(TreeLogger logger, String template, TemplateGeneratorOptions options) {
     SourceBuilder<?> context = options.getContext(logger, template);
-    URL url = ClassLoader.getSystemResource(template);
-    if (url == null) {
-      logger.log(Type.ERROR, "You requested code generation for template " + template +
-        ", but the file could not be found.");
-      throw new CompilationFailed();
-    }
+    InputStream input;
     try {
-      InputStream input = url.openStream();
+      if (new File(template).exists()) {
+        input = new FileInputStream(template);
+      } else {
+        URL url = getClass().getClassLoader().getResource(template);
+        if (url == null) {
+          url = ClassLoader.getSystemResource(template);
+          if (url == null) {
+            logger.log(Type.ERROR, "You requested code generation for template " + template +
+              ", but the file could not be found.");
+            throw new CompilationFailed();
+          }
+        }
+        input = url.openStream();
+      }
       BufferedReader reader = new BufferedReader(new InputStreamReader(input));
       String line;
       while ((line = reader.readLine()) != null) {

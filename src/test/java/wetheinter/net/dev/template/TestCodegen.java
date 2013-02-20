@@ -30,7 +30,6 @@ public class TestCodegen {
       .createInnerClass("class InnerClass")
       .createMethod("void innerMethod()")
       ;
-    System.out.println(b);
     Assert.assertTrue(b.toString().contains("import java.lang.String;"));
     Assert.assertTrue(b.toString().contains("import java.util.Date;"));
     Assert.assertTrue(b.toString().contains("<T extends Date>"));
